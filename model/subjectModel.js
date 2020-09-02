@@ -20,6 +20,10 @@ const subjectModel = sequelize.define(
             },
             set: function (val) {
                 return this.setDataValue('teachers', JSON.stringify(val));
+            },
+            references: {
+                model: SUBJECT,
+                key: 'subject_name'
             }
         },
         className: {
@@ -39,5 +43,6 @@ const subjectModel = sequelize.define(
     }
 );
 subjectModel.sync();
+subjectModel.belongsTo(classModel);
 
 module.exports = subjectModel;

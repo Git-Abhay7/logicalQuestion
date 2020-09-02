@@ -36,5 +36,8 @@ const studentModel = sequelize.define(
     }
 );
 studentModel.sync();
+studentModel.belongsTo(classModel);
+studentModel.belongsTo(schoolModel);
+
 
 module.exports = studentModel;
