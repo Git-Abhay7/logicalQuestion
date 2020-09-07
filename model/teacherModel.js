@@ -1,5 +1,7 @@
 const Sequelize = require("sequelize");
 var sequelize = require("../dbConnection/connection");
+const subjectModel = require("../model/subjectModel")
+const classModel = require("../model/classModel")
 
 const teacherModel = sequelize.define(
     "TEACHER",
@@ -20,10 +22,6 @@ const teacherModel = sequelize.define(
             },
             set: function (val) {
                 return this.setDataValue('subjectName', JSON.stringify(val));
-            },
-            references: {
-                model: SUBJECT,
-                key: 'subject_name'
             }
         },
         class: {
@@ -33,10 +31,6 @@ const teacherModel = sequelize.define(
             },
             set: function (val) {
                 return this.setDataValue('class', JSON.stringify(val));
-            },
-            references: {
-                model: CLASS,
-                key: 'className'
             }
         },
         isClassTeacher: {
@@ -57,6 +51,21 @@ const teacherModel = sequelize.define(
     }
 );
 teacherModel.sync();
-teacherModel.hasMany(subjectModel);
+teacherModel.belongsTo(classModel, { foreignKey: 'id' });
+classModel.hasMany(teacherModel, { foreignKey: 'id' });
+
+teacherModel.belongsTo(subjectModel, { foreignKey: 'id' });
+subjectModel.hasMany(teacherModel, { foreignKey: 'id' });
+
 
 module.exports = teacherModel;
+
+teacherModel.AddTeacher = async (body) => {
+    try {
+        const data = await teacherModel.create(body)
+        return data;
+    }
+    catch (error) {
+        throw error;
+    }
+}

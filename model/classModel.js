@@ -1,6 +1,6 @@
 const Sequelize = require("sequelize");
 var sequelize = require("../dbConnection/connection");
-const studentModel = require("./studentModel");
+const studentModel = require("../model/studentModel");
 
 const classModel = sequelize.define(
     "CLASS",
@@ -21,7 +21,16 @@ const classModel = sequelize.define(
             },
             set: function (val) {
                 return this.setDataValue('subjectName', JSON.stringify(val));
+            }
+        },
+        studentName: {
+            type: Sequelize.STRING,
+            get: function () {
+                return JSON.parse(this.getDataValue('subjectName'));
             },
+            set: function (val) {
+                return this.setDataValue('subjectName', JSON.stringify(val));
+            }
         },
         createdAt: {
             allowNull: false,
@@ -37,6 +46,17 @@ const classModel = sequelize.define(
     }
 );
 classModel.sync();
-classModel.hasMany(studentModel)
 
+studentModel.belongsTo(classModel,  { foreignKey: 'id' });
+classModel.hasMany(studentModel, { foreignKey: 'id' });
 module.exports = classModel;
+
+classModel.AddClass = async (body) => {
+    try {
+      const Data = await classModel.create(body)
+      return Data;
+    }
+    catch (error) {
+      throw error;
+    }
+  }
