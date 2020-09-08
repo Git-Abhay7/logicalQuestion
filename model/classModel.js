@@ -1,6 +1,6 @@
 const Sequelize = require("sequelize");
-var sequelize = require("../dbConnection/connection");
-const studentModel = require("../model/studentModel");
+var sequelize = require("../dbConnection/connection")
+const studentModel = require("../model/studentModel")
 
 const classModel = sequelize.define(
     "CLASS",
@@ -16,21 +16,21 @@ const classModel = sequelize.define(
         },
         subjectName: {
             type: Sequelize.STRING,
-            get: function () {
-                return JSON.parse(this.getDataValue('subjectName'));
-            },
-            set: function (val) {
-                return this.setDataValue('subjectName', JSON.stringify(val));
-            }
+            // get: function () {
+            //     return JSON.parse(this.getDataValue('subjectName'));
+            // },
+            // set: function (val) {
+            //     return this.setDataValue('subjectName', JSON.stringify(val));
+            // }
         },
         studentName: {
             type: Sequelize.STRING,
-            get: function () {
-                return JSON.parse(this.getDataValue('subjectName'));
-            },
-            set: function (val) {
-                return this.setDataValue('subjectName', JSON.stringify(val));
-            }
+            // get: function () {
+            //     return JSON.parse(this.getDataValue('studentName'));
+            // },
+            // set: function (val) {
+            //     return this.setDataValue('studentName', JSON.stringify(val));
+            // }
         },
         createdAt: {
             allowNull: false,
@@ -46,7 +46,6 @@ const classModel = sequelize.define(
     }
 );
 classModel.sync();
-
 
 classModel.hasMany(studentModel, { foreignKey: 'id' });
 studentModel.belongsTo(classModel, { foreignKey: 'id' });

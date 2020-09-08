@@ -2,6 +2,8 @@ const Sequelize = require("sequelize");
 var sequelize = require("../dbConnection/connection");
 const subjectModel = require("../model/subjectModel")
 const classModel = require("../model/classModel")
+const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken")
 
 const teacherModel = sequelize.define(
     "TEACHER",
@@ -33,6 +35,14 @@ const teacherModel = sequelize.define(
                 return this.setDataValue('class', JSON.stringify(val));
             }
         },
+        t_email: {
+            type: Sequelize.STRING,
+            allowNull: false
+        },
+        password: {
+            type: Sequelize.STRING,
+            allowNull: false
+        },
         isClassTeacher: {
             type: Sequelize.DataTypes.ENUM('yes', 'no'),
             defaultValue: 'no',
@@ -62,6 +72,9 @@ module.exports = teacherModel;
 
 teacherModel.AddTeacher = async (body) => {
     try {
+        const saltRound = 10;
+        var hash = await bcrypt.hash(body.password, saltRound);
+        body.password = hash
         const data = await teacherModel.create(body)
         return data;
     }
@@ -120,5 +133,37 @@ teacherModel.UpdateTeacher = async (body) => {
     catch (error) {
         throw error;
     }
-} 
+}
+teacherModel.Login = async (body) => {
+    try {
+        var found = await teacherModel.findOne({
+            where: {
+                t_email: body.t_email,
+            }
+        });
+        if (found != null) {
+            var plain = await bcrypt.compare(body.password, found.password);
+            if (plain == true) {
+                var token = jwt.sign(
+                    {
+                        t_email: body.t_email,
+                    },
+                    "LoGiC",
+                    {
+                        expiresIn: 60 * 60,
+                    }
+                );
+                return token;
+            } else {
+                return false;
+            }
+        } else {
+            let err = new Error("Email doesnot Exist.")
+            err.status = 400
+            throw err;
+        }
+    } catch (error) {
+        throw error
+    }
+}
 

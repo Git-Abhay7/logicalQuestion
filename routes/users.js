@@ -1,5 +1,7 @@
 var express = require('express');
 var router = express.Router();
+var middleware = require("../Middleware/auth");
+
 const teacherController = require("../dbController/teacherController")
 const schoolController = require("../dbController/schoolController")
 const classController = require("../dbController/classController")
@@ -11,6 +13,8 @@ router.post('/addTeacher', teacherController.addTeacher);
 router.get('/getTeacher/:id', teacherController.getTeacher);
 router.get('/deleteTeacher/:id', teacherController.deleteTeacher);
 router.post('/updateTeacher', teacherController.updateTeacher);
+router.post('/teacherLogin', teacherController.login);
+router.get("/fetchTeacher", middleware.TokenVerify, teacherController.fetchData);
 
 router.post('/addSchool', schoolController.addSchool);
 router.get('/getSchool/:id', schoolController.getSchool);
@@ -26,6 +30,9 @@ router.post('/addStudent', studentController.addStudent);
 router.get('/getStudent/:id', studentController.getStudent);
 router.get('/deletStudent/:id', studentController.deleteStudent);
 router.post('/updateStudent', studentController.updateStudent);
+router.post('/studentLogin', studentController.login);
+router.get("/fetchstudent", middleware.TokenVerify, studentController.fetchData);
+
 
 router.post('/addSubject', subjectcontroller.addSubject);
 router.get('/getSubject/:id', subjectcontroller.getSubject);

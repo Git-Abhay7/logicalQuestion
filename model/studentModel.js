@@ -1,6 +1,7 @@
 const Sequelize = require("sequelize");
 var sequelize = require("../dbConnection/connection");
-const classModel = require("../model/classModel")
+const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken")
 
 const studentModel = sequelize.define(
     "STUDENT",
@@ -11,6 +12,14 @@ const studentModel = sequelize.define(
             primaryKey: true,
         },
         student_name: {
+            type: Sequelize.STRING,
+            allowNull: false
+        },
+        password: {
+            type: Sequelize.STRING,
+            allowNull: false
+        },
+        std_email: {
             type: Sequelize.STRING,
             allowNull: false
         },
@@ -37,12 +46,13 @@ const studentModel = sequelize.define(
             beforeCreate: async function (STUDENT) {
                 const result = await this.findOne({
                     where: {
+                        std_email: STUDENT.std_email,
                         RollNo: STUDENT.RollNo,
                         className: STUDENT.className
                     }
                 })
                 if (result) {
-                    if (result.schoolName == STUDENT.RollNo && result.className == STUDENT.className) {
+                    if ((result.RollNo == STUDENT.RollNo && result.className == STUDENT.className) || (result.std_email == STUDENT.std_email)) {
                         let err = new Error("STUDENT Already Exist.")
                         err.status = 400
                         throw err;
@@ -60,6 +70,9 @@ studentModel.sync();
 
 studentModel.AddStudent = async (body) => {
     try {
+        const saltRound = 10;
+        var encrypt = await bcrypt.hash(body.password, saltRound);
+        body.password = encrypt;
         const student = await studentModel.create(body)
         return student;
     }
@@ -119,4 +132,37 @@ studentModel.UpdateSchool = async (body) => {
         throw error;
     }
 }
+studentModel.Login = async (body) => {
+    try {
+        var found = await studentModel.findOne({
+            where: {
+                std_email: body.std_email,
+            }
+        });
+        if (found != null) {
+            var plain = await bcrypt.compare(body.password, found.password);
+            if (plain == true) {
+                var token = jwt.sign(
+                    {
+                        std_email: body.std_email,
+                    },
+                    "LoGiC",
+                    {
+                        expiresIn: 60 * 60,
+                    }
+                );
+                return token;
+            } else {
+                return false;
+            }
+        } else {
+            let err = new Error("Email doesnot Exist.")
+            err.status = 400
+            throw err;
+        }
+    } catch (error) {
+        throw error
+    }
+}
+
 module.exports = studentModel;
