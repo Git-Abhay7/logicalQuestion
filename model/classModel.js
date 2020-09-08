@@ -47,16 +47,59 @@ const classModel = sequelize.define(
 );
 classModel.sync();
 
-studentModel.belongsTo(classModel,  { foreignKey: 'id' });
+
 classModel.hasMany(studentModel, { foreignKey: 'id' });
+studentModel.belongsTo(classModel, { foreignKey: 'id' });
+
 module.exports = classModel;
 
 classModel.AddClass = async (body) => {
     try {
-      const Data = await classModel.create(body)
-      return Data;
+        const Data = await classModel.create(body)
+        return Data;
     }
     catch (error) {
-      throw error;
+        throw error;
     }
-  }
+}
+classModel.GetClass = async (params) => {
+    try {
+        var found = await classModel.findOne({
+            where: {
+                id: params.id,
+            },
+            include: [{
+                model: classModel
+            }],
+        });
+        return found;
+    }
+    catch (error) {
+        throw error;
+    }
+};
+classModel.DeleteClass = async (params) => {
+    try {
+        var trash = await classModel.destroy({
+            where: {
+                id: params.id,
+            }
+        });
+        return trash;
+    }
+    catch (error) {
+        throw error;
+    }
+} 
+classModel.UpdateClass = async (body) => {
+    try {
+        let values = {
+            className : body.className
+          }
+        var updation = await classModel.update(values)
+        return updation;
+    }
+    catch (error) {
+        throw error;
+    }
+} 

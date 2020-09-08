@@ -56,6 +56,7 @@ const schoolModel = sequelize.define(
   }
 );
 schoolModel.sync();
+
 schoolModel.hasMany(studentModel, { foreignKey: 'id' });
 studentModel.hasOne(schoolModel, { foreignKey: 'id' });
 
@@ -65,7 +66,6 @@ teacherModel.belongsTo(schoolModel, { foreignKey: 'id' });
 schoolModel.hasMany(classModel, { foreignKey: 'id' });
 classModel.belongsTo(schoolModel, { foreignKey: 'id' });
 
-
 module.exports = schoolModel;
 
 schoolModel.AddSchool = async (body) => {
@@ -73,12 +73,13 @@ schoolModel.AddSchool = async (body) => {
     const data = await schoolModel.create(body)
     return data;
   }
+
   catch (error) {
     throw error;
   }
 
 }
-schoolModel.GetUser = async (params) => {
+schoolModel.GetSchool = async (params) => {
   try {
     var found = await schoolModel.findOne({
       where: {
@@ -97,4 +98,41 @@ schoolModel.GetUser = async (params) => {
   catch (error) {
     throw error;
   }
-};
+}
+schoolModel.DeleteSchool = async (params) => {
+  try {
+    var trash = await schoolModel.destroy({
+      where: {
+        id: params.id,
+      }
+    });
+    return trash;
+  }
+  catch (error) {
+    throw error;
+  }
+}
+schoolModel.UpdateSchool = async (body) => {
+  try {
+    var found = await schoolModel.findOne({
+      where: {
+        id: body.id,
+      }
+    });
+    if (found != null) {
+      let values = {
+        schoolName: body.schoolName
+      }
+      var updation = await schoolModel.update(values, {
+        where: {
+          id: body.id,
+        }
+      })
+      return updation;
+    }
+  }
+  catch (error) {
+    throw error;
+  }
+}
+

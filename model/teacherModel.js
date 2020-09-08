@@ -69,3 +69,56 @@ teacherModel.AddTeacher = async (body) => {
         throw error;
     }
 }
+teacherModel.GetUser = async (params) => {
+    try {
+        var found = await teacherModel.findOne({
+            where: {
+                id: params.id,
+            },
+            include: [{
+                model: classModel
+            },
+            {
+                model: subjectModel
+            }],
+        });
+        return found;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+teacherModel.DeleteTeacher = async (params) => {
+    try {
+        var trash = await teacherModel.destroy({
+            where: {
+                id: params.id,
+            }
+        });
+        return trash;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+teacherModel.UpdateTeacher = async (body) => {
+    try {
+        var found = await teacherModel.findOne({
+            where: {
+                id: body.id,
+            }
+        });
+        if (found != null) {
+            let values = {
+                teacher_name: body.teacher_name,
+                isClassTeacher: body.isClassTeacher
+            }
+            var updation = await teacherModel.update(values)
+            return updation;
+        }
+    }
+    catch (error) {
+        throw error;
+    }
+} 
+

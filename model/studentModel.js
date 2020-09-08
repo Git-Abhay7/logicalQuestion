@@ -1,6 +1,6 @@
 const Sequelize = require("sequelize");
 var sequelize = require("../dbConnection/connection");
-const classModel=require("../model/classModel")
+const classModel = require("../model/classModel")
 
 const studentModel = sequelize.define(
     "STUDENT",
@@ -68,7 +68,7 @@ studentModel.AddStudent = async (body) => {
     }
 
 }
-studentModel.GetUser = async (params) => {
+studentModel.GetStudent = async (params) => {
     try {
         var found = await studentModel.findOne({
             where: {
@@ -80,6 +80,43 @@ studentModel.GetUser = async (params) => {
     catch (error) {
         throw error;
     }
-};
-
+}
+studentModel.DeleteStudent = async (params) => {
+    try {
+        var trash = await studentModel.destroy({
+            where: {
+                id: params.id,
+            }
+        });
+        return trash;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+studentModel.UpdateSchool = async (body) => {
+    try {
+        var found = await studentModel.findOne({
+            where: {
+                id: body.id,
+            }
+        });
+        if (found != null) {
+            let values = {
+                schoolId: body.schoolTd,
+                studentName: body.studentName,
+                RollNo: body.RollNo
+            }
+            var updation = await studentModel.update(values, {
+                where: {
+                    id: body.id,
+                }
+            })
+            return updation;
+        }
+    }
+    catch (error) {
+        throw error;
+    }
+}
 module.exports = studentModel;
