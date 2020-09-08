@@ -1,4 +1,7 @@
 var Teacher = require("../model/teacherModel");
+const classModel = require("../model/classModel")
+const subjectModel = require("../model/subjectModel")
+
 module.exports = {
     addTeacher: async (req, res) => {
         try {
@@ -41,6 +44,38 @@ module.exports = {
             else {
                 res.status(400).json("unable to update");
             }
+        } catch (error) {
+            throw error;
+        }
+    },
+    login: async (req, res) => {
+        try {
+            const login = await Teacher.Login(req.body);
+            if (login == false) {
+                res.status(400).json("Wrong password");
+            }
+            else {
+                res.status(200).json({ token: login });
+            }
+        }
+        catch (error) {
+            res.status(400).send(error.send)
+        }
+    },
+    fetchData: async (req, res) => {
+        try {
+            var Found = await Teacher.findOne({
+                where: {
+                    t_email: req.User.t_email
+                },
+                include: [{
+                    model: classModel
+                },
+                {
+                    model: subjectModel
+                }],
+            });
+            res.status(200).send(Found);
         } catch (error) {
             throw error;
         }
